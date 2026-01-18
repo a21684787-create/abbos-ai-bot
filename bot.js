@@ -2,10 +2,10 @@ const { Telegraf } = require('telegraf');
 const OpenAI = require('openai');
 const http = require('http');
 
-// Render uchun server
+// Render o'chib qolmasligi uchun
 http.createServer((req, res) => {
   res.writeHead(200);
-  res.end('Bot is running');
+  res.end('Bot is Active');
 }).listen(process.env.PORT || 3000);
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -14,43 +14,29 @@ const openai = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1",
 });
 
-bot.start((ctx) => ctx.reply("Salom! Men tayyorman. Savolingizni yozing."));
+bot.start((ctx) => ctx.reply("Assalomu alaykum! Abbosbekning boti tayyor. Savol bering!"));
 
 bot.on('text', async (ctx) => {
   try {
-    // Bot ishlayotganini ko'rsatish
     await ctx.sendChatAction('typing');
-
+    
     const response = await openai.chat.completions.create({
       messages: [{ role: "user", content: ctx.message.text }],
-      model: "llama-3.3-70b-versatile",
+      model: "llama3-8b-8192", // Bu model juda tez va bepul limitda yaxshi ishlaydi
     });
 
-    const reply = response.choices[0].message.content;
-    await ctx.reply(reply);
-    
-  } catch (e) {
-    console.error("Xatolik tafsiloti:", e);
-    
-    // Foydalanuvchiga tushunarli xato xabari
-    if (e.message.includes("401")) {
-      ctx.reply("Xato: Groq API kaliti noto'g'ri kiritilgan.");
-    } else if (e.message.includes("429")) {
-      ctx.reply("Xato: API limit tugadi. Birozdan keyin urinib ko'ring.");
-    } else {
-      ctx.reply("Xato yuz berdi: " + e.message);
-    }
+    const aiResponse = response.choices[0].message.content;
+    await ctx.reply(aiResponse);
+
+  } catch (error) {
+    console.error("Xatolik:", error.message);
+    await ctx.reply("Xatolik yuz berdi. Birozdan so'ng urinib ko'ring.");
   }
 });
 
-async function startBot() {
-  try {
-    await bot.telegram.deleteWebhook({ drop_pending_updates: true });
-    await bot.launch();
-    console.log(">>> BOT_READY");
-  } catch (err) {
-    console.error("Launch Error:", err);
-  }
+async function main() {
+  await bot.telegram.deleteWebhook({ drop_pending_updates: true });
+  bot.launch().then(() => console.log("Bot ishga tushdi!"));
 }
 
-startBot();
+main();
