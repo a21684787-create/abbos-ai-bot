@@ -27,14 +27,11 @@ bot.on('text', async (ctx) => {
     await ctx.reply(response.choices[0].message.content);
   } catch (e) {
     console.error("AI Error:", e.message);
-    ctx.reply("Hozir bot biroz band, keyinroq urinib ko'ring.");
   }
 });
 
-// Botni ishga tushirish
 async function launch() {
   try {
-    // Eski seanslarni tozalash
     await bot.telegram.deleteWebhook({ drop_pending_updates: true });
     await bot.launch();
     console.log(">>> Bot muvaffaqiyatli yoqildi!");
@@ -45,6 +42,5 @@ async function launch() {
 
 launch();
 
-// Xatolarni ushlash (Sintaksis xatosiz variant)
 process.on('uncaughtException', (err) => console.error('System Error:', err));
 process.on('unhandledRejection', (err) => console.error('Promise Error:', err));
