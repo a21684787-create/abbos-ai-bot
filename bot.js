@@ -5,38 +5,35 @@ const http = require('http');
 // Render o'chib qolmasligi uchun server
 http.createServer((req, res) => {
   res.writeHead(200);
-  res.end('Bot is Active');
-}).listen(process.env.PORT || 3000);
+  res.end('Bot is running');
+}).listen(process.env.PORT || 10000);
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+// API kalitlarini tozalab olish (trim orqali bo'sh joylarni o'chiramiz)
+const BOT_TOKEN = process.env.BOT_TOKEN ? process.env.BOT_TOKEN.trim() : "";
+const GROQ_KEY = process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.trim() : "";
+
+const bot = new Telegraf(BOT_TOKEN);
 const openai = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: GROQ_KEY,
   baseURL: "https://api.groq.com/openai/v1",
 });
 
-bot.start((ctx) => ctx.reply("Assalomu alaykum! Abbosbekning boti tayyor. Savol bering!"));
+bot.start((ctx) => ctx.reply("Assalomu alaykum! Bot muvaffaqiyatli ishga tushdi. Savol bering!"));
 
 bot.on('text', async (ctx) => {
   try {
     await ctx.sendChatAction('typing');
-    
     const response = await openai.chat.completions.create({
       messages: [{ role: "user", content: ctx.message.text }],
-      model: "llama3-8b-8192", 
+      model: "llama3-8b-8192",
     });
-
-    const aiResponse = response.choices[0].message.content;
-    await ctx.reply(aiResponse);
-
-  } catch (error) {
-    console.error("Xatolik:", error.message);
-    await ctx.reply("Tizim xatosi: " + error.message);
+    await ctx.reply(response.choices[0].message.content);
+  } catch (err) {
+    console.error("AI Error:", err.message);
+    // Agar kalit xato bo'lsa, aniq sababini aytadi
+    await ctx.reply("Xatolik: " + err.message);
   }
 });
 
-async function main() {
-  await bot.telegram.deleteWebhook({ drop_pending_updates: true });
-  bot.launch().then(() => console.log(">>> BOT ISHLADI!"));
-}
-
-main();
+// Botni ishga tushirish
+bot.launch().then(() => console.log(">>> BOT TAYYOR!"));
