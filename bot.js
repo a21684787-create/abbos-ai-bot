@@ -17,7 +17,7 @@ const openai = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1",
 });
 
-bot.start((ctx) => ctx.reply("Assalomu alaykum! Abbosbekning boti yangilandi va tayyor. Savol bering!"));
+bot.start((ctx) => ctx.reply("Assalomu alaykum! Qanday yordam bera olaman!"));
 
 bot.on('text', async (ctx) => {
   try {
@@ -35,3 +35,4 @@ bot.on('text', async (ctx) => {
 });
 
 bot.launch().then(() => console.log(">>> BOT TAYYOR!"));
+
