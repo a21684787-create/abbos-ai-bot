@@ -2,7 +2,7 @@ const { Telegraf } = require('telegraf');
 const OpenAI = require('openai');
 const http = require('http');
 
-// Render o'chib qolmasligi uchun
+// Render o'chib qolmasligi uchun server
 http.createServer((req, res) => {
   res.writeHead(200);
   res.end('Bot is Active');
@@ -22,7 +22,7 @@ bot.on('text', async (ctx) => {
     
     const response = await openai.chat.completions.create({
       messages: [{ role: "user", content: ctx.message.text }],
-      model: "llama3-8b-8192", // Bu model juda tez va bepul limitda yaxshi ishlaydi
+      model: "llama3-8b-8192", 
     });
 
     const aiResponse = response.choices[0].message.content;
@@ -30,13 +30,13 @@ bot.on('text', async (ctx) => {
 
   } catch (error) {
     console.error("Xatolik:", error.message);
-    await ctx.reply("Xatolik yuz berdi. Birozdan so'ng urinib ko'ring.");
+    await ctx.reply("Tizim xatosi: " + error.message);
   }
 });
 
 async function main() {
   await bot.telegram.deleteWebhook({ drop_pending_updates: true });
-  bot.launch().then(() => console.log("Bot ishga tushdi!"));
+  bot.launch().then(() => console.log(">>> BOT ISHLADI!"));
 }
 
 main();
